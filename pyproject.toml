@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "observerutil"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Andrey Smirnov", email="smirnovcode@mail.ru" },
 ]
-description = "Let you subscribe and listen in right manner"
+description = "Let you implement observer pattern from the box"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
