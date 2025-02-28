@@ -24,7 +24,8 @@ my_message = 'some message here'
 # or
 my_message = {1: 2}
 
-# distribute message to func_a and func_b
+# Distribute message to func_a and func_b.
+# Any exceptions will be ignored.
 observers.send_message(my_message)
 ```
 
