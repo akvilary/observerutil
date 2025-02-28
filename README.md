@@ -62,7 +62,12 @@ def func_a(message: int):
     print(100 / message)
 
 def convert_to_int(message: str):
-    return int(message)
+    # exception of adapter is not excepted by Observers instance.
+    # add try...except by self if required.
+    try:
+        return int(message)
+    except Exception:
+        return None
 
 observers = Observers(message_adapter=convert_to_int)
 observers.add(func_a)
