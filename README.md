@@ -13,7 +13,7 @@ from typing import Any
 from observerutil import Observers
 
 def func_a(message: Any):
-	...
+    ...
 
 def func_b(message: Any):
     ...
@@ -37,7 +37,7 @@ from observerutil import Observer, Observers, ErrorHandler
 
 
 def func_a(message: int):
-	print(100 / message)
+    print(100 / message)
 
 
 def write_exception_to_logs(exc: Exception):
@@ -59,7 +59,7 @@ from observerutil import Observers
 
 
 def func_a(message: int):
-	print(100 / message)
+    print(100 / message)
 
 def convert_to_int(message: str):
     return int(message)
