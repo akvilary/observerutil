@@ -76,7 +76,7 @@ observers = Observers()
 observers.add(func_a)
 
 message = 0
-observers.send_message(message)
+observers.notify(message)
 ```
 
 If you would like to adapt message for observers in the collection then add message adapter
