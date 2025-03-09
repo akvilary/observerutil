@@ -18,10 +18,9 @@ def test_ignore_reraised_errors():
     observer = Observer(func=testing_func, error_handler=error_handler)
     observers = Observers(
         observers=[observer],
-        message_adapter=lambda message: int(message),
     )
     assert result_keeper.result == 100
     message = 0
-    observers.send_message(message)
+    observers.notify(message)
     assert len(error_handler.exceptions) == 1
     assert isinstance(error_handler.exceptions[0], ZeroDivisionError)

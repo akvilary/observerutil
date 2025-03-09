@@ -1,5 +1,5 @@
 from helpers import ResultKeeper, XErrorHandler
-from observerutil import Observer, Observers
+from observerutil import Observer, Observers, AdaptEachArg
 
 
 def test_distributing_listening():
@@ -14,10 +14,10 @@ def test_distributing_listening():
     observer = Observer(func=testing_func, error_handler=error_handler)
     observers = Observers(
         observers=[observer],
-        message_adapter=lambda message: int(message),
+        parameters_adapter=AdaptEachArg(int),
     )
     assert result_keeper.result == 100
     message = '2'
-    observers.send_message(message)
+    observers.notify(message)
     assert result_keeper.result == 50
     assert len(error_handler.exceptions) == 0

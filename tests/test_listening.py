@@ -15,6 +15,6 @@ def test_listening():
     observers = Observers([observer])
     assert len(messages) == 0
     message = 1
-    observers.send_message(message)
+    observers.notify(message)
     assert len(messages) == 1
     assert len(error_handler.exceptions) == 0

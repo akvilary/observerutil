@@ -12,23 +12,49 @@ Any callable can become observer
 from typing import Any
 from observerutil import Observers
 
-def func_a(message: Any):
+def func_a():
     ...
 
-def func_b(message: Any):
+def func_b():
     ...
 
 observers = Observers([func_a])
 observers.add(func_b)
-my_message = 'some message here'
-# or
-my_message = {1: 2}
 
-# Distribute message to func_a and func_b.
-# Any exceptions will be ignored.
-observers.send_message(my_message)
+observers.notify()
 ```
 
+It is possible to provide any args and kwargs to observer
+```python
+from typing import Any
+from observerutil import Observers
+
+def func_a(message: int):
+    ...
+
+observers = Observers()
+observers.add(func_a)
+
+# Distribute message to func_a.
+# Any exceptions will be ignored.
+message = 0
+observers.notify(message)
+```
+
+```python
+from typing import Any
+from observerutil import Observers
+
+def func_a(**kwargs):
+    ...
+
+observers = Observers()
+observers.add(func_a)
+
+# Distribute kwargs to func_a.
+# Any exceptions will be ignored.
+observers.notify(user_id=123, role='client')
+```
 But in this case any exception will be ignored. 
 If you would like to catch exceptions then use Observer with error handler.
 
@@ -49,8 +75,8 @@ observer = Observer(func_a, error_handler=write_exception_to_logs)
 observers = Observers()
 observers.add(func_a)
 
-my_message = 0
-observers.send_message(my_message)
+message = 0
+observers.send_message(message)
 ```
 
 If you would like to adapt message for observers in the collection then add message adapter
@@ -62,18 +88,33 @@ from observerutil import Observers
 def func_a(message: int):
     print(100 / message)
 
-def convert_to_int(message: str):
-    # exception of adapter is not excepted by Observers instance.
-    # add try...except by self if required.
-    try:
-        return int(message)
-    except Exception:
-        return None
 
-observers = Observers(message_adapter=convert_to_int)
+# parameters_adapter has to implement IParametersAdapter interface
+def convert_to_int(*args, **kwargs):
+    # exception of adapter is not catched by Observers instance.
+    # add try...except here by self if required.
+    return [int(arg) for arg in args], kwargs
+
+
+observers = Observers(parameters_adapter=convert_to_int)
 observers.add(func_a)
 
-my_message = '2'
-# any exceptions of observers (funcs or Observer instances) will be excepted while sending
-observers.send_message(my_message)
+message = '2'
+observers.notify(message)
+```
+
+More elegant way to convert each arg
+```python
+from typing import Any
+from observerutil import Observers, AdaptEachArg
+
+
+def func_a(message: int):
+    print(100 / message)
+
+observers = Observers(parameters_adapter=AdaptEachArg(int))
+observers.add(func_a)
+
+message = '2'
+observers.notify(message)
 ```

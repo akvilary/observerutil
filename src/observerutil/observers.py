@@ -7,7 +7,7 @@ from typing import Any, Callable, Optional, Iterable
 
 from .interfaces import (
     IObserver,
-    IMessageAdapter,
+    IParametersAdapter,
     IErrorHandler,
 )
 
@@ -25,13 +25,13 @@ class Observer(IObserver):
         self.func = func
         self.error_handler = error_handler
 
-    def __call__(self, message: Any):
+    def __call__(self, *args, **kwargs):
         """
         Listen message.
         Catch errors by error_handler (if provided)
         """
         try:
-            self.func(message)
+            self.func(*args, **kwargs)
         except Exception as exc:  # pylint: disable=broad-exception-caught
             if callable(self.error_handler):
                 self.error_handler(exc)
@@ -41,7 +41,7 @@ class Observers:
     """
     Registry of observers.
     It is not possible to subscribe each observer more than once.
-    Provide message_adapter if you would like to adapt message for all registered observers.
+    Provide parameters_adapter if you would like to adapt parameters for all registered observers.
     Any exceptions of observers will be excepted while sending message.
     """
 
@@ -49,10 +49,10 @@ class Observers:
         self,
         observers: Optional[Iterable[IObserver | Callable]] = None,
         *,
-        message_adapter: Optional[IMessageAdapter | Callable] = None,
+        parameters_adapter: Optional[IParametersAdapter] = None,
     ):
         self.registry = {id(x): x for x in observers or []}
-        self.message_adapter = message_adapter
+        self.parameters_adapter = parameters_adapter
 
     def __bool__(self):
         return bool(self.registry)
@@ -63,8 +63,8 @@ class Observers:
     def __len__(self):
         return len(self.registry)
 
-    def __call__(self, message: Any):
-        self.send_message(message)
+    def __call__(self, *args, **kwargs):
+        self.notify(*args, **kwargs)
 
     def add(self, observer: Any):
         """
@@ -78,16 +78,15 @@ class Observers:
         """
         self.registry.pop(id(observer), None)
 
-    def send_message(self, message: Any):
+    def notify(self, *args, **kwargs):
         """
-        Send message to observers
+        Notify observers
         """
-        if self.message_adapter:
-            message = self.message_adapter(message)
+        if self.parameters_adapter:
+            args, kwargs = self.parameters_adapter(*args, **kwargs)
 
         for observer in self:
-            # protection from reraise of errors receivers
             try:
-                observer(message)
+                observer(*args, **kwargs)
             except Exception:  # pylint: disable=broad-exception-caught
                 continue

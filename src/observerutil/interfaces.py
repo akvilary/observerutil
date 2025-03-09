@@ -4,7 +4,7 @@ Interfaces
 """
 
 from abc import abstractmethod
-from typing import Any
+from typing import Any, Dict, Iterable, Tuple
 
 
 # pylint: disable=too-few-public-methods
@@ -14,7 +14,7 @@ class IObserver:
     Get message and do some work with it.
     """
     @abstractmethod
-    def __call__(self, message: Any):
+    def __call__(self, *args, **kwags):
         """
         Listen message
         """
@@ -24,19 +24,20 @@ class IObserver:
 class ISubject:
     """
     Subject iterface.
-    Send message.
     """
 
 
 # pylint: disable=too-few-public-methods
-class IMessageAdapter:
+class IParametersAdapter:
     """
-    Message adapter interface.
-    Get message and return adapted message.
+    Parameters adapter interface.
     """
-    @abstractmethod
-    def __call__(self, message: Any) -> Any:
-        raise NotImplementedError()
+
+    def __call__(self, *args, **kwargs) -> Tuple[Iterable[Any], Dict[str, Any]]:
+        """
+        Adapt parameters for observer
+        """
+        return args, kwargs
 
 
 # pylint: disable=too-few-public-methods
